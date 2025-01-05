@@ -75,11 +75,7 @@ export class ReadingService {
     const customer = await this.findCustomerReadingByCustomerId(calculatedto.customerCustomerId);
     console.log(customer.currentReading, customer.previousReading);
 
-    if (customer.dueBill === 0) {
-      return {
-        message: "No due bill"
-      };
-    }
+    
 
     let consumption = 0;
     if (customer.previousReading > customer.currentReading) {
@@ -101,6 +97,11 @@ export class ReadingService {
     customer.dueBill += Math.floor(totalCost);
     customer.previousReading = customer.currentReading;
     customer.currentReading = 0;
+    if (customer.dueBill === 0) {
+        return {
+          message: "No due bill"
+        };
+      }
     await this.readingRepository.save(customer);
   }
 
