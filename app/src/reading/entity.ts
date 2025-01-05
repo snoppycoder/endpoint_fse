@@ -12,7 +12,7 @@ export class CustomerReading {
   @Column({default: 100})
   previousReading: number;
  
-  @Column({default:1, type:'int'})
+  @Column({type:'int'})
   dueBill:number
 
   @OneToOne(() => Customer)
