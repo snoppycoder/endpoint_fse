@@ -13,10 +13,10 @@ import { ContactModule } from './contact/contact.module';
 @Module({
   imports: [TypeOrmModule.forRoot({
           type:'mysql',
-          host: 'localhost',
+          host: 'bt17yhulbhdq8jyaqfb8-mysql.services.clever-cloud.com',
           port: 3306,
-          username: 'root',
-          password: '',
+          username: 'u7y1hqee0qd8g9t7',
+          password: 'w1iL9ob93daJhhmKZg8E',
           database: 'kotari_tracker',
           entities: [Customer, CustomerReading, Tariff],
           synchronize:true, //avoid data loss
