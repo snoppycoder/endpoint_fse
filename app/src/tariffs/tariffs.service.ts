@@ -14,7 +14,7 @@ export class TariffsService {
         const [rows] = await this.tariffRepository.query(
             `
             SELECT *
-            FROM tariffs
+            FROM tariff
             WHERE min <= ? AND max >= ?
                OR (min <= ? AND max IS NULL)
             `,
