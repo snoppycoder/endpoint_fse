@@ -11,5 +11,5 @@ export class Tariff {
   @Column()
   average:number
   @Column('decimal', { precision: 10, scale: 2 })
-  current_rate: number;
+  year_2019: number;
 }
