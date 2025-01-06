@@ -83,8 +83,9 @@ export class ReadingService {
       consumption = (maxReading - customer.previousReading) + customer.currentReading;
     } else {
       consumption = customer.currentReading - customer.previousReading;
+      let test = await this.tariffsService.findTariffByRange(consumption);
     }
-    console.log(consumption);
+    console.log(consumption, test);
 
     let totalCost = 0;
 
