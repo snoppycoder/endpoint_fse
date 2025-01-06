@@ -73,7 +73,7 @@ export class ReadingService {
 
   async calculateTariff(calculatedto: CalculateDto): Promise<any> {
     const customer = await this.findCustomerReadingByCustomerId(calculatedto.customerCustomerId);
-    console.log(customer.currentReading, customer.previousReading);
+    console.log(customer);
 
     
 
