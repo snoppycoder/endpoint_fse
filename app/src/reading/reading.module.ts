@@ -10,6 +10,7 @@ import { Customer } from 'src/auth/entity';
 @Module({
   imports: [TypeOrmModule.forFeature([CustomerReading, Customer]), TariffsModule],
   providers: [ReadingService],
+  
   controllers: [ReadingController]
 })
 

@@ -9,4 +9,6 @@ export class ReadingDto {
     @IsNotEmpty()       
     @IsString()       
     customerCustomerId: string;
+
+    
 }

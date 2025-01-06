@@ -74,9 +74,11 @@ export class ReadingService {
   async calculateTariff(calculatedto: CalculateDto): Promise<any> {
     const customer = await this.findCustomerReadingByCustomerId(calculatedto.customerCustomerId);
     console.log(customer);
-
-    
-
+    if(customer.currentReading === 0) {
+        return {
+            message:"No need there is not due bill"
+        }
+    }
     let consumption = 0;
     if (customer.previousReading > customer.currentReading) {
       const maxReading = 9999; 
