@@ -96,7 +96,7 @@ export class ReadingService {
       consumption -= tariff.min;
       totalCost += tariff.year_2019;
     }
-
+     console.log("leave loop")
     customer.dueBill += Math.floor(totalCost);
     customer.previousReading = customer.currentReading;
     customer.currentReading = 0;
