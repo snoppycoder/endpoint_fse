@@ -85,12 +85,12 @@ export class ReadingService {
       consumption = customer.currentReading - customer.previousReading;
       let test = await this.tariffsService.findTariffByRange(consumption);
     }
-    console.log(consumption, test);
+    console.log(consumption, customer.dueBill);
 
     let totalCost = 0;
 
     while (consumption > 0) {
-    console.log(customer.currentReading, customer.previousReading, customer.dueBill, customer.id);
+    
 
       const tariff = await this.tariffsService.findTariffByRange(consumption);
       consumption -= tariff.min;
