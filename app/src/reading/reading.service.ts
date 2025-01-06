@@ -91,7 +91,7 @@ export class ReadingService {
     while (consumption > 0) {
       const tariff = await this.tariffsService.findTariffByRange(consumption);
       consumption -= tariff.min;
-      totalCost += tariff.year_2019;
+      totalCost += tariff.current_rate;
     }
 
     customer.dueBill += Math.floor(totalCost);

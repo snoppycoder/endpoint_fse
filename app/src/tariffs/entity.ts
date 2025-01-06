@@ -6,7 +6,7 @@ export class Tariff {
   id: number;
   @Column()
   min: number
-  @Column()
+  @Column({ nullable: true })
   max: number;
   @Column()
   average:number
