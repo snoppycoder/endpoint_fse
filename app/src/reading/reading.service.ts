@@ -91,7 +91,7 @@ export class ReadingService {
 
     while (consumption > 0) {
     
-
+      console.log("entered the loop")
       const tariff = await this.tariffsService.findTariffByRange(consumption);
       consumption -= tariff.min;
       totalCost += tariff.year_2019;
