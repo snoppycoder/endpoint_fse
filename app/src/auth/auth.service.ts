@@ -20,7 +20,7 @@ export class AuthService {
     ){}
     async createAccount(creatcustomerdto:CreateCustomerDto):Promise<Customer>{
         const {name, password, email, phoneNumber, CustomerId, role} = creatcustomerdto;
-        const existingUser = await this.customerRepository.findOne({where: [{email}, {phoneNumber}, {CustomerId}]})
+        const existingUser = await this.customerRepository.findOne({where: [{email}]})
          //noted  that it is connected with an 'or' condition
        
         if(existingUser){
