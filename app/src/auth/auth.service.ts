@@ -72,11 +72,9 @@ export class AuthService {
            }
            const token = this.jwtService.sign(payload)
            console.log(token)
-           return {
-            message:"Successfully logged in",
-            token:token,
-            role:loginUser.role
-           }
+           return token
+            
+           
         }
         else {
             throw new HttpException('wrong credential', HttpStatus.BAD_REQUEST)
