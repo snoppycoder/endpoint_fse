@@ -71,8 +71,11 @@ export class AuthService {
               email:loginUser.email
            }
            const token = this.jwtService.sign(payload)
-           console.log(token)
-           return token
+          
+            return {
+            token: token,
+            email: loginUser.email
+        }
             
            
         }
