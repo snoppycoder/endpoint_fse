@@ -2,14 +2,14 @@ import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber } from "class-validator";
 
 export class PaymentMethodDto{
 
-    @IsNotEmpty()
+
     @IsPhoneNumber('ET')
-    phoneNumber:string
+    phoneNumber?:string
 
     
-    @IsNotEmpty()
+    
     @IsEmail()
-    email:string
+    email?:string
 
     @IsNotEmpty()
     CustomerId: string
