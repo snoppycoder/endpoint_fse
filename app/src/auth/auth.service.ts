@@ -64,12 +64,14 @@ export class AuthService {
         }
         const isValid = await bcrypt.compare(password, loginUser.password)
         if(isValid){
+           
             //sign jwt token
            const payload = {
               role:loginUser.role,
               email:loginUser.email
            }
            const token = this.jwtService.sign(payload)
+           console.log(token)
            return {
             message:"Successfully logged in",
             token:token,
