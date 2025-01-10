@@ -62,7 +62,7 @@ export class AuthService {
         if(!loginUser){
             throw new HttpException("The user isn't signed in redirect to the signup option", HttpStatus.UNAUTHORIZED)
         }
-        const isValid = await bcrypt.compare(loginUser.password, password)
+        const isValid = await bcrypt.compare(password, loginUser.password)
         if(isValid){
             //sign jwt token
            const payload = {
