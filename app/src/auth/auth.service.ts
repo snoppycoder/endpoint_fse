@@ -56,9 +56,9 @@ export class AuthService {
     }
     async loginAccount(logincustomerdto:LoginCustomerDto):Promise<any>{
         
-        const {CustomerId, email, password, role} = logincustomerdto
+        const {email, password, role} = logincustomerdto
     
-        const loginUser = await this.customerRepository.findOne({where:[{CustomerId}, {email}]})
+        const loginUser = await this.customerRepository.findOne({where:[{email}]})
         if(!loginUser){
             throw new HttpException("The user isn't signed in redirect to the signup option", HttpStatus.UNAUTHORIZED)
         }
