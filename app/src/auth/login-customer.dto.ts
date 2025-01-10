@@ -1,9 +1,9 @@
-import { IsEmail, IsNotEmpty, ValidateIf } from "class-validator";
+import { IsEmail, IsNotEmpty, ValidateIf, IsOptional } from "class-validator";
 
 export class LoginCustomerDto {
-  @ValidateIf(o => !o.email)  
-  @IsNotEmpty({ message: "Admin role" })
-  CustomerId: string;
+  @ValidateIf(o => !o.email) 
+  @IsOptional()
+  CustomerId?: string;
 
   @ValidateIf(o => !o.customerId)  // If CustomerId is not provided, email is required
   @IsEmail({}, { message: "Invalid email format." })
