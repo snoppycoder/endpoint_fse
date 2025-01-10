@@ -111,55 +111,71 @@ export class ReadingService {
   }
 
   async PaymentMethod(paymentdto: PaymentMethodDto) {
-    const uniqueCode = uuidv4();
-    const { phoneNumber, email, CustomerId } = paymentdto;
+  const uniqueCode = uuidv4();
+  const { phoneNumber, email, CustomerId } = paymentdto;
 
-    const customer = await this.findCustomerReadingByCustomerId(CustomerId);
-    const amount = customer.dueBill;
-    if (isNaN(amount) || amount <= 0) {
-      throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
-    }
-
-    var myHeaders = new Headers();
-    myHeaders.append("Authorization", "Bearer CHASECK_TEST-8lj2ZAmO4w5vqX6fUzVssI3I7Hb21WYY");
-    myHeaders.append("Content-Type", "application/json");
-
-    var raw = JSON.stringify({
-      "amount": amount,
-      "currency": "ETB",
-      "email": email,
-      "first_name": "Bilen",
-      "last_name": "Gizachew",
-      "phone_number": phoneNumber,
-      "tx_ref": uniqueCode,
-      "callback_url": "https://webhook.site/077164d6-29cb-40df-ba29-8a00e59a7e60",
-      "return_url": "",
-      "customization[title]": "Payment for my favourite merchant",
-      "customization[description]": "I love online payments",
-      "meta[hide_receipt]": "true"
-    });
-
- 
-    const response = await fetch("https://api.chapa.co/v1/transaction/initialize", {
-      method: 'POST',
-      headers: myHeaders,
-      body: raw,
-      redirect: 'manual'
-    });
-    const result = await response.json();
-    console.log(result);
-
-   
-    return this.pollPaymentStatus(uniqueCode, 18, 10000, CustomerId);
+  const customer = await this.findCustomerReadingByCustomerId(CustomerId);
+  const amount = customer.dueBill;
+  if (isNaN(amount) || amount <= 0) {
+    throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
   }
 
-  
-  private async pollPaymentStatus(txRef: string, maxRetries, interval, CustomerId:string ): Promise<string> {
-    let attempts = 0;
-    return new Promise((resolve, reject) => {
-      const poll = setInterval(async () => {
-        attempts++;
-        const status = await this.checkPaymentStatus(txRef, CustomerId);
+  const headers = new Headers({
+    Authorization: "Bearer CHASECK_TEST-8lj2ZAmO4w5vqX6fUzVssI3I7Hb21WYY",
+    "Content-Type": "application/json",
+  });
+
+  const requestBody = JSON.stringify({
+    amount,
+    currency: "ETB",
+    email,
+    first_name: "Bilen",
+    last_name: "Gizachew",
+    phone_number: phoneNumber,
+    tx_ref: uniqueCode,
+    callback_url: "https://webhook.site/077164d6-29cb-40df-ba29-8a00e59a7e60",
+    customization: {
+      title: "Payment for my favourite merchant",
+      description: "I love online payments",
+    },
+    meta: {
+      hide_receipt: "true",
+    },
+  });
+
+  const response = await fetch("https://api.chapa.co/v1/transaction/initialize", {
+    method: 'POST',
+    headers,
+    body: requestBody,
+    redirect: 'manual',
+  });
+
+  const result = await response.json();
+  if (result.status !== "success") {
+    throw new HttpException("Payment initialization failed", HttpStatus.BAD_REQUEST);
+  }
+
+  console.log("Payment initialized:", result);
+
+  // Start polling
+  return this.pollPaymentStatus(uniqueCode, 18, 10000, CustomerId, amount);
+}
+
+private async pollPaymentStatus(
+  txRef: string,
+  maxRetries: number,
+  interval: number,
+  CustomerId: string,
+  expectedAmount: number
+): Promise<string> {
+  let attempts = 0;
+
+  return new Promise((resolve, reject) => {
+    const poll = setInterval(async () => {
+      attempts++;
+
+      try {
+        const status = await this.checkPaymentStatus(txRef, CustomerId, expectedAmount);
 
         if (status === "success") {
           clearInterval(poll);
@@ -171,29 +187,47 @@ export class ReadingService {
           clearInterval(poll);
           reject("Polling timed out");
         }
-      }, interval);
-    });
+      } catch (error) {
+        console.error("Error during polling:", error.message);
+        if (attempts >= maxRetries) {
+          clearInterval(poll);
+          reject("Polling timed out due to errors");
+        }
+      }
+    }, interval);
+  });
+}
+
+private async checkPaymentStatus(
+  txRef: string,
+  CustomerId: string,
+  expectedAmount: number
+): Promise<string> {
+  const customer = await this.findCustomerReadingByCustomerId(CustomerId);
+
+  const response = await fetch(`https://api.chapa.co/v1/transaction/verify/${txRef}`, {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer CHASECK_TEST-8lj2ZAmO4w5vqX6fUzVssI3I7Hb21WYY",
+    },
+  });
+
+  const data = await response.json();
+  console.log("Payment verification result:", data);
+
+  if (data.status !== "success") {
+    return data.data.status; // 'failed', 'pending', or other statuses
   }
 
-  // Step 4: Check Payment Status
-  private async checkPaymentStatus(txRef: string, CustomerId): Promise<string> {
-    const customer = await this.findCustomerReadingByCustomerId(CustomerId);
-    const response = await fetch(`https://api.chapa.co/v1/transaction/verify/${txRef}`, {
-      method: "GET",
-      headers: {
-        "Authorization": "Bearer CHASECK_TEST-8lj2ZAmO4w5vqX6fUzVssI3I7Hb21WYY",
-      },
-    });
+  // Additional checks
+  const { amount, currency, status } = data.data;
 
-    const data = await response.json();
-    console.log('Payment verification result:', data);
-
-    if (data.status === "success") {
-      customer.dueBill = 0
-      await this.readingRepository.save(customer)
-      return data.data.status; // 'success', 'failed', or 'pending'
-    } else {
-      throw new HttpException("Error verifying payment", HttpStatus.BAD_REQUEST);
-    }
+  if (status === "success" && amount === expectedAmount && currency === "ETB") {
+    customer.dueBill = 0;
+    await this.readingRepository.save(customer);
+    return "success";
   }
+
+  throw new HttpException("Error verifying payment or mismatched data", HttpStatus.BAD_REQUEST);
+}
 }
