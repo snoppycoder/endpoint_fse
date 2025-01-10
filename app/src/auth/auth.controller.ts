@@ -17,7 +17,7 @@ export class AuthController {
 
         this.authService.createAccount(createcustomerdto)
     }
-    @Post('/signin')
+    @Post('signin')
     async loginAccount(@Body() logincustomerdto:LoginCustomerDto){
         this.authService.loginAccount(logincustomerdto)
     }
