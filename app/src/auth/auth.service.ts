@@ -72,11 +72,9 @@ export class AuthService {
            }
            const token = this.jwtService.sign(payload)
           
-            return {
-            token: token,
-            email: loginUser.email
-        }
             
+            return token
+          
            
         }
         else {
