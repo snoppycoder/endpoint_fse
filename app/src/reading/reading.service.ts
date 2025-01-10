@@ -204,7 +204,7 @@ private async checkPaymentStatus(
   expectedAmount: number
 ): Promise<string> {
   const customer = await this.findCustomerReadingByCustomerId(CustomerId);
-
+  console.log("customer");
   const response = await fetch(`https://api.chapa.co/v1/transaction/verify/${txRef}`, {
     method: "GET",
     headers: {
